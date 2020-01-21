@@ -1,0 +1,7 @@
+version: '2'
+
+syncs:
+  nuxt-firebase-sns-volume:
+    src: .
+    sync_strategy: native_osx
+    sync_excludes: [ '.git', '.github', '.idea', '.circleci' ]

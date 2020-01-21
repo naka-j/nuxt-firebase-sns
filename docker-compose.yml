@@ -1,0 +1,15 @@
+version: '3'
+
+services:
+  nuxt:
+    build: containers/nuxt
+    tty: true
+    command: yarn dev
+    volumes:
+      - nuxt-firebase-sns-volume:/usr/src/app:nocopy
+    ports:
+      - "8090:3000"
+
+volumes:
+  nuxt-firebase-sns-volume:
+    external: true
