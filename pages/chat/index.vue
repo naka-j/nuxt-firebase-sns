@@ -1,7 +1,16 @@
 <template>
   <div>
-    <div>{{ $store.getters.getUserName }} でログイン中</div>
-    <div v-for='comment in loadedComments' :key='comment' class='comment'>
+    <section class="hero is-primary">
+      <div class="hero-body">
+        <p class="title">
+          Welcome!
+        </p>
+        <p class="subtitle">
+          free chat
+        </p>
+      </div>
+    </section>
+    <div v-for='comment in loadedComments' :key='comment.id' class='comment'>
       {{ comment.text }}
     </div>
   </div>
@@ -11,17 +20,21 @@
 import firebase from 'firebase'
 
 export default {
+  layout: 'authenticated',
   created() {
     this.fetchComments()
   },
   methods: {
-    fetchComments() {
-      this.$store.dispatch('fetchComments')
+    async fetchComments() {
+      await this.$store.dispatch('fetchComments')
     },
   },
   computed: {
     loadedComments() {
       return this.$store.getters.getComments
+    },
+    currentUserName() {
+      return this.$store.getters.getUserName
     }
   }
 }

@@ -1,31 +1,35 @@
 import firebase from '@/plugins/firebase';
 import { vuexfireMutations, firestoreAction } from 'vuexfire'
+import {
+  SET_CURRENT_USER, 
+  SET_COMMENTS
+} from './mutation-type'
 
 const db = firebase.firestore();
 const commentRef = db.collection('comments')
 
 export const state = () => ({
-  userUid: '',
+  currentUser: null,
   userName: '',
   comments: []
 })
 
 export const mutations = {
   ...vuexfireMutations,
-  setUserUid(state, userUid) {
-    state.userUid = userUid
+  [SET_CURRENT_USER](state, payload) {
+    state.currentUser = payload.user
   },
-  setUserName(state, userName) {
-    state.userName = userName
-  },
-  setComments(state, comments) {
-    state.comments = comments
+  [SET_COMMENTS](state, payload) {
+    state.comments = payload.comments
   },
 }
 
 export const getters = {
+  getCurrentUser(state) {
+    return state.currentUser
+  },
   getUserName(state){
-    return state.userName
+    return state.currentUser ? state.currentUser.displayName : ''
   },
   getComments(state) {
     return state.comments
@@ -36,15 +40,17 @@ export const actions = {
   init: firestoreAction(({ bindFirebaseRef }, usersRef) => {
     bindFirebaseRef('users', usersRef);
   }),
-  signin({ commit }) {
+  async signin({ commit }) {
     const provider = new firebase.auth.GoogleAuthProvider()
-    firebase.auth().signInWithPopup(provider).then(function(result) {
-      const user = result.user
-      commit('setUserUid', user.id)
-      commit('setUserName', user.displayName)
+    await firebase.auth().signInWithPopup(provider).then(function(result) {
+      const user = { 
+        uid: result.user.uid,
+        displayName: result.user.displayName,
+        photoURL: result.user.photoURL
+      }
+      commit(SET_CURRENT_USER, { user })
     }).catch(function(error) {
       console.log(error)
-      console.log('error : ' + error.code)
     })
   },
   async fetchComments({ commit }) {
@@ -57,8 +63,7 @@ export const actions = {
           'userId': 'user1',
         }
       ]
-      console.log(comments)
-      commit('setComments', comments)
+      commit('setComments', { comments })
     } catch(error) {
       console.log(error)
     }
