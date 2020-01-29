@@ -2,7 +2,8 @@ import firebase from '@/plugins/firebase';
 import { vuexfireMutations, firestoreAction } from 'vuexfire'
 import {
   SET_CURRENT_USER, 
-  SET_COMMENTS
+  SET_COMMENTS,
+  ADD_COMMENT
 } from './mutation-type'
 
 const db = firebase.firestore();
@@ -22,6 +23,9 @@ export const mutations = {
   [SET_COMMENTS](state, payload) {
     state.comments = payload.comments
   },
+  [ADD_COMMENT](state, payload) {
+    state.comments.push(payload.comment)
+  }
 }
 
 export const getters = {
@@ -63,14 +67,17 @@ export const actions = {
           'userId': 'dummy',
         },
         {
-          'id': 'hogehogehogehoge',
+          'id': 'hogehogehogehoge2',
           'text': 'こんにちは！',
           'userId': 'qVsUYvnZ1man5PgivohCp9pX5Ui1',
         }
       ]
-      commit('setComments', { comments })
+      commit(SET_COMMENTS, { comments })
     } catch(error) {
       console.log(error)
     }
+  },
+  async sendComment({ commit }, comment) {
+    commit(ADD_COMMENT, { comment })
   }
 }

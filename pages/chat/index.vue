@@ -1,14 +1,14 @@
 <template>
-  <div class='chat-block'>
-    <div v-for='comment in loadedComments' :key='comment.id' class='comment'>
-      <comment-item :text="comment.text" :isOwner="isOwner(comment)"></comment-item>
-    </div>
+  <div class="chat-block">
+    <comment-list :comments="loadedComments" />
+    <comment-textarea :keydownEvent="sendComment" />
   </div>
 </template>
 
 <script>
-import firebase from 'firebase'
-import commentItem from '@/components/chat/comment-item'
+import commentList from '@/components/chat/comment-list'
+import commentTextarea from '@/components/input/textarea'
+
 export default {
   layout: 'authenticated',
   created() {
@@ -18,24 +18,26 @@ export default {
     async fetchComments() {
       await this.$store.dispatch('fetchComments')
     },
-    // ログインユーザーのコメントかどうか？
-    isOwner(comment) {
-      return comment.userId === this.currentUserId
+    async sendComment(e) {
+      if (e.metaKey && e.target.value.trim()) {
+        const comment = {
+          text: e.target.value,
+          userId: this.$store.getters.getCurrentUser.uid
+        }
+        await this.$store.dispatch('sendComment', comment).then(function() {
+          e.target.value = ''
+        })
+      }
     }
   },
   computed: {
     loadedComments() {
       return this.$store.getters.getComments
-    },
-    currentUserName() {
-      return this.$store.getters.getUserName
-    },
-    currentUserId() {
-      return this.$store.getters.getCurrentUser.uid
-    },
+    }
   },
   components: {
-    'comment-item': commentItem
+    commentList,
+    commentTextarea
   }
 }
 </script>
@@ -43,13 +45,6 @@ export default {
 <style scoped>
   .chat-block {
     max-width: 30rem;
-    height: 75vh;
     margin: auto;
   }
-  
-  .comment {
-    margin: 5px;
-  }
-
-
 </style>
