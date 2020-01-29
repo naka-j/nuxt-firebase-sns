@@ -60,7 +60,12 @@ export const actions = {
         {
           'id': 'hogehogehogehoge',
           'text': 'テストテストダミーダミー',
-          'userId': 'user1',
+          'userId': 'dummy',
+        },
+        {
+          'id': 'hogehogehogehoge',
+          'text': 'こんにちは！',
+          'userId': 'qVsUYvnZ1man5PgivohCp9pX5Ui1',
         }
       ]
       commit('setComments', { comments })

@@ -1,6 +1,6 @@
 <template>
   <div>
-    <nav class="navbar" role="navigation" aria-label="dropdown navigation">
+    <nav class="navbar is-light" role="navigation" aria-label="dropdown navigation">
       <div class="navbar-menu">
         <div class="navbar-end">
           <div class="navbar-item has-dropdown" :class="{ 'is-active': showMenu }" @click="toggleMenu">
