@@ -9,7 +9,7 @@ export default {
   methods: {
     signin() {
       const _this = this
-      _this.$store.dispatch('signin').then(function() {
+      _this.$store.dispatch('signinWithGoogle').then(function() {
         _this.$router.push('/chat')
       })
     }

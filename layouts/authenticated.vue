@@ -9,7 +9,7 @@
             </a>
 
             <div class="navbar-dropdown is-right">
-              <a class="navbar-item">
+              <a class="navbar-item" @click="logout">
                 ログアウト
               </a>
             </div>
@@ -38,13 +38,13 @@ export default {
   methods: {
     toggleMenu() {
       this.showMenu = !this.showMenu
+    },
+    async logout() {
+      const _this = this
+      await _this.$store.dispatch('logout').then(function() {
+        _this.$router.push('/signin')
+      })
     }
   }
 }
 </script>
-
-<style scoped>
-  .header {
-    padding: 1.5rem;
-  }
-</style>
