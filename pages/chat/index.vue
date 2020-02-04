@@ -11,8 +11,8 @@ import commentTextarea from '@/components/input/textarea'
 
 export default {
   layout: 'authenticated',
-  created() {
-    this.fetchComments()
+  async created() {
+    await this.fetchComments()
   },
   methods: {
     async fetchComments() {
@@ -28,7 +28,7 @@ export default {
           e.target.value = ''
         })
       }
-    }
+    },
   },
   computed: {
     loadedComments() {

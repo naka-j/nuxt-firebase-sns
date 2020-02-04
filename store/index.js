@@ -1,6 +1,7 @@
 import firebase from '@/plugins/firebase';
 import { vuexfireMutations, firestoreAction } from 'vuexfire'
 import Cookie from 'js-cookie'
+import cloneDeep from 'lodash/cloneDeep'
 import {
   SET_CURRENT_USER, 
   SET_COMMENTS,
@@ -14,7 +15,7 @@ const commentRef = db.collection('comments')
 export const state = () => ({
   currentUser: null,
   userName: '',
-  comments: []
+  comments: null
 })
 
 export const mutations = {
@@ -23,7 +24,7 @@ export const mutations = {
     state.currentUser = payload.userInfo
   },
   [SET_COMMENTS](state, payload) {
-    state.comments = payload.comments
+    state.comments = cloneDeep(payload.comments)
   },
   [ADD_COMMENT](state, payload) {
     state.comments.push(payload.comment)
@@ -82,20 +83,13 @@ export const actions = {
   },
   async fetchComments({ commit }) {
     try {
-      // const comments = await commentRef.get()
-      const comments = [
-        {
-          'id': 'hogehogehogehoge',
-          'text': 'テストテストダミーダミー',
-          'userId': 'dummy',
-        },
-        {
-          'id': 'hogehogehogehoge2',
-          'text': 'こんにちは！',
-          'userId': 'qVsUYvnZ1man5PgivohCp9pX5Ui1',
-        }
-      ]
-      commit(SET_COMMENTS, { comments })
+      const comments = await commentRef.get()
+      if (!comments.docs.length) return
+      commit(SET_COMMENTS, { 
+        comments: comments.docs.map(function(doc) {
+          return doc.data()
+        }) 
+      })
     } catch(error) {
       console.log(error)
     }
