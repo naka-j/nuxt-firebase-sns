@@ -1,7 +1,8 @@
 import firebase from '@/plugins/firebase';
 import { vuexfireMutations, firestoreAction } from 'vuexfire'
 import Cookie from 'js-cookie'
-import cloneDeep from 'lodash/cloneDeep'
+import moment from 'moment'
+import { cloneDeep } from 'lodash'
 import {
   SET_CURRENT_USER, 
   SET_COMMENTS,
@@ -9,13 +10,13 @@ import {
 } from './mutation-type'
 const authHelper = require('../helpers/auth')
 
-const db = firebase.firestore();
+const db = firebase.firestore()
 const commentRef = db.collection('comments')
 
 export const state = () => ({
   currentUser: null,
   userName: '',
-  comments: null
+  comments: []
 })
 
 export const mutations = {
@@ -83,7 +84,7 @@ export const actions = {
   },
   async fetchComments({ commit }) {
     try {
-      const comments = await commentRef.get()
+      const comments = await commentRef.orderBy('postedAt').get()
       if (!comments.docs.length) return
       commit(SET_COMMENTS, { 
         comments: comments.docs.map(function(doc) {
@@ -95,6 +96,13 @@ export const actions = {
     }
   },
   async sendComment({ commit }, comment) {
-    commit(ADD_COMMENT, { comment })
+    await commentRef.add({ 
+      ...comment, 
+      postedAt: moment().toDate()
+    }).then(function() {
+      commit(ADD_COMMENT, { comment })
+    }).catch(function(error){
+      console.log(error)
+    })
   }
 }
