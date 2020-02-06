@@ -12,12 +12,9 @@ import commentTextarea from '@/components/input/textarea'
 export default {
   layout: 'authenticated',
   async created() {
-    await this.fetchComments()
+    this.$store.dispatch('realtimeFetchComments')
   },
   methods: {
-    async fetchComments() {
-      await this.$store.dispatch('fetchComments')
-    },
     async sendComment(e) {
       if (e.metaKey && e.target.value.trim()) {
         const comment = {

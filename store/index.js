@@ -24,11 +24,8 @@ export const mutations = {
   [SET_CURRENT_USER](state, payload) {
     state.currentUser = payload.userInfo
   },
-  [SET_COMMENTS](state, payload) {
-    state.comments = cloneDeep(payload.comments)
-  },
-  [ADD_COMMENT](state, payload) {
-    state.comments.push(payload.comment)
+  async [ADD_COMMENT](state, payload) {
+    await commentRef.add(payload.comment)
   }
 }
 
@@ -57,9 +54,6 @@ export const actions = {
     }
     commit(SET_CURRENT_USER, { userInfo })
   },
-  init: firestoreAction(({ bindFirebaseRef }, usersRef) => {
-    bindFirebaseRef('users', usersRef);
-  }),
   async signinWithGoogle({ dispatch }) {
     const provider = new firebase.auth.GoogleAuthProvider()
     const { user } = await firebase.auth().signInWithPopup(provider)
@@ -82,27 +76,19 @@ export const actions = {
     Cookie.remove('access_token')
     commit(SET_CURRENT_USER, {})
   },
-  async fetchComments({ commit }) {
+  realtimeFetchComments: firestoreAction(({ bindFirestoreRef }) => {
+    bindFirestoreRef('comments', commentRef.orderBy('postedAt'))
+  }),
+  async sendComment({ commit }, comment) {
     try {
-      const comments = await commentRef.orderBy('postedAt').get()
-      if (!comments.docs.length) return
-      commit(SET_COMMENTS, { 
-        comments: comments.docs.map(function(doc) {
-          return doc.data()
-        }) 
+      commit(ADD_COMMENT, { 
+        comment: { 
+          ...comment, 
+          postedAt: moment().toDate()
+        }
       })
     } catch(error) {
       console.log(error)
     }
-  },
-  async sendComment({ commit }, comment) {
-    await commentRef.add({ 
-      ...comment, 
-      postedAt: moment().toDate()
-    }).then(function() {
-      commit(ADD_COMMENT, { comment })
-    }).catch(function(error){
-      console.log(error)
-    })
   }
 }

@@ -28,6 +28,7 @@ export default {
 <style scoped>
   .comment-list {
     height: 75vh;
+    overflow-y: scroll;
   }
   
   .comment {
