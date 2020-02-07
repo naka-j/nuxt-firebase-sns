@@ -1,3 +1,4 @@
 export const SET_CURRENT_USER = 'setCurrentUser'
-export const SET_COMMENTS = 'setComments'
+export const USER_SIGNUP = 'userSignup'
+export const USER_SIGNIN = 'userSignin'
 export const ADD_COMMENT = 'addComment'

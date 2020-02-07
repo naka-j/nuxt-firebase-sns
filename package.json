@@ -18,7 +18,7 @@
     "firebase-tools": "^7.12.1",
     "js-cookie": "^2.2.1",
     "jwt-decode": "^2.2.0",
-    "lodash": "^4.17.15",
+    "moment": "^2.24.0",
     "nuxt": "^2.0.0",
     "vue": "^2.6.11",
     "vuexfire": "^3.2.1"

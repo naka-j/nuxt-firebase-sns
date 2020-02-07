@@ -2,15 +2,17 @@ import firebase from '@/plugins/firebase';
 import { vuexfireMutations, firestoreAction } from 'vuexfire'
 import Cookie from 'js-cookie'
 import moment from 'moment'
-import { cloneDeep } from 'lodash'
+
 import {
-  SET_CURRENT_USER, 
-  SET_COMMENTS,
+  SET_CURRENT_USER,
+  USER_SIGNUP,
+  USER_SIGNIN,
   ADD_COMMENT
 } from './mutation-type'
 const authHelper = require('../helpers/auth')
 
 const db = firebase.firestore()
+const userRef = db.collection('users')
 const commentRef = db.collection('comments')
 
 export const state = () => ({
@@ -21,6 +23,15 @@ export const state = () => ({
 
 export const mutations = {
   ...vuexfireMutations,
+  async [USER_SIGNUP](state, payload) {
+    // 新規ユーザーの場合DBに保存
+    await userRef.add(payload.user)
+  },
+  async [USER_SIGNIN](state, payload) {
+    // 既存ユーザーのsignin時はtokenを更新
+    const user = payload.user
+    await userRef.where('uid', user.uid).update({ token: user.token })
+  },
   [SET_CURRENT_USER](state, payload) {
     state.currentUser = payload.userInfo
   },
@@ -61,7 +72,11 @@ export const actions = {
       console.log(error)
     })
   },
-  async signin({ commit }, user) {
+  async isRegisteredUser({}, uid) {
+    const users = await userRef.where('uid', '==', uid).get()
+    return users.size > 0
+  },
+  async signin({ commit, dispatch }, user) {
     const token = await firebase.auth().currentUser.getIdToken(true)
     const userInfo = { 
       uid: user.uid,
@@ -69,6 +84,15 @@ export const actions = {
       email: user.email,
       photoUrl: user.photoURL
     }
+    const isRegisteredUser = await dispatch('isRegisteredUser', userInfo.uid)
+    // 既存ユーザーかどうかでmutationを変える（signin or signup）
+    const SIGNIN_MUTATION = isRegisteredUser ? USER_SIGNIN : USER_SIGNUP
+    commit(SIGNIN_MUTATION, { 
+      user: {
+        ...userInfo,
+        token
+      } 
+    })
     Cookie.set('access_token', token)
     commit(SET_CURRENT_USER, { userInfo })
   },
