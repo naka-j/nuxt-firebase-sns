@@ -11,7 +11,10 @@ import commentTextarea from '@/components/input/textarea'
 
 export default {
   layout: 'authenticated',
+  mounted() {
+  },
   async created() {
+    this.$store.dispatch('fecthUserinfoMap')
     this.$store.dispatch('realtimeFetchComments')
   },
   methods: {

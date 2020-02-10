@@ -7,6 +7,7 @@ import {
   SET_CURRENT_USER,
   USER_SIGNUP,
   USER_SIGNIN,
+  SET_USERINFO_MAP,
   ADD_COMMENT
 } from './mutation-type'
 const authHelper = require('../helpers/auth')
@@ -18,6 +19,7 @@ const commentRef = db.collection('comments')
 export const state = () => ({
   currentUser: null,
   userName: '',
+  userinfoMap: {},
   comments: []
 })
 
@@ -34,6 +36,9 @@ export const mutations = {
   },
   [SET_CURRENT_USER](state, payload) {
     state.currentUser = payload.userInfo
+  } ,
+  [SET_USERINFO_MAP](state, payload) {
+    state.userinfoMap = payload.userinfoMap
   },
   async [ADD_COMMENT](state, payload) {
     await commentRef.add(payload.comment)
@@ -46,6 +51,9 @@ export const getters = {
   },
   getUserName(state){
     return state.currentUser ? state.currentUser.displayName : ''
+  },
+  getUserinfoMap(state) {
+    return state.userinfoMap
   },
   getComments(state) {
     return state.comments
@@ -114,5 +122,19 @@ export const actions = {
     } catch(error) {
       console.log(error)
     }
-  }
+  },
+  fecthUserinfoMap({ commit }) {
+    userRef.get().then(function(result) {
+      const userinfoMap = {}
+      result.docs.map(function(doc) {
+        const user = doc.data()
+        userinfoMap[user.uid] = {
+          name: user.name,
+          photoUrl: user.photoUrl
+        }
+      })
+
+      commit(SET_USERINFO_MAP, { userinfoMap })
+    })
+  } 
 }
