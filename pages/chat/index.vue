@@ -1,11 +1,19 @@
 <template>
-  <div class="chat-block">
-    <comment-list :comments="loadedComments" />
-    <comment-textarea :keydownEvent="sendComment" />
+  <div>
+    <div class="room-block">
+      <room-list />
+    </div>
+    <div class="chat-block">
+
+      <comment-list :comments="loadedComments" />
+      <comment-textarea :keydownEvent="sendComment" />
+      
+    </div>
   </div>
 </template>
 
 <script>
+import roomList from '@/components/chat/room-list'
 import commentList from '@/components/chat/comment-list'
 import commentTextarea from '@/components/input/textarea'
 
@@ -36,6 +44,7 @@ export default {
     }
   },
   components: {
+    roomList,
     commentList,
     commentTextarea
   }
@@ -43,8 +52,15 @@ export default {
 </script>
 
 <style scoped>
+  .room-block {
+    display: inline-block;
+    vertical-align: top;
+    width: 20%;
+  }
   .chat-block {
-    max-width: 30rem;
+    display: inline-block;
+    vertical-align: top;
+    width: 70%;
     margin: auto;
   }
 </style>
